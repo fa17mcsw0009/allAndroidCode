@@ -1,0 +1,205 @@
+package app.studentmanagement.com.studentmanagement;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+
+public class SQLiteConnection extends SQLiteOpenHelper{
+
+    SQLiteDatabase db;
+    public static String DATABASE_NAME = "DATABASE_MANAGEMENT.db";
+    public static String TABLE_NAME = "data";
+    public static String COLUMN1 = "id";
+    public static String COLUMN2 = "user_name";
+    public static String COLUMN3 = "user_email";
+    public static String COLUMN4 = "user_mobile";
+    public static String COLUMN5 = "user_id";
+    public static String COLUMN6 = "user_city";
+    public static String COLUMN7 = "user_password";
+
+
+    public SQLiteConnection(Context context) {
+        super(context, DATABASE_NAME, null, 1);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String query = "create table data" + " (id integer primary key autoincrement not null, user_name text, user_email text, user_mobile text, user_id text, user_city text, user_password text )";
+        db.execSQL(query);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME + ";" );
+        db.close();
+
+
+    }
+
+
+    public boolean insert_data(String u_Name, String u_Email, String u_Mobile, String u_id, String u_city, String u_pwd)
+    {
+        db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN2, u_Name);
+        contentValues.put(COLUMN3, u_Email);
+        contentValues.put(COLUMN4, u_Mobile);
+        contentValues.put(COLUMN5, u_id);
+        contentValues.put(COLUMN6, u_city);
+        contentValues.put(COLUMN7, u_pwd);
+
+        long result = db.insert(TABLE_NAME, null, contentValues);
+
+        if(result == -1)
+        {
+            return false;
+        }
+        else
+            {
+                return true;
+            }
+
+    }
+
+    public String searchUser(String userNAme)
+    {
+        db = this.getReadableDatabase();
+        String query = "select user_name from "+TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+        String name = "empty";
+        if(cursor.moveToNext())
+        {
+
+            do
+                {
+                    name = cursor.getString(0);
+                    if(userNAme.equals(name))
+                    {
+                        break;
+                    }
+
+                }while(cursor.moveToNext());
+
+
+        }
+
+        return name;
+    }
+
+    public ArrayList<Records> user_login(String u_pwd)
+    {
+        db = this.getReadableDatabase();
+        String query = "select *  from "+TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+        String password = "empty";
+        ArrayList<Records> arrayList = new ArrayList<Records>();
+        if(cursor.moveToNext())
+        {
+            do
+                {
+
+                    password = cursor.getString(6);
+                    if(u_pwd.equals(password))
+                    {
+                        Records records = new Records();
+
+                        records.setUserName(cursor.getString(1));
+                        records.setEmail(cursor.getString(2));
+                        records.setMobileNo(cursor.getString(3));
+                        records.setStudentId(cursor.getString(4));
+                        records.setCity(cursor.getString(5));
+                        records.setPassword(cursor.getString(6));
+                        arrayList.add(records);
+                        break;
+                    }
+
+
+                }while(cursor.moveToNext());
+        }
+
+        return arrayList;
+    }
+
+    public ArrayList<Records> search_student_id(String id)
+    {
+        db = this.getReadableDatabase();
+        String query = "select * from "+TABLE_NAME;
+        Cursor cursor = db.rawQuery(query,null);
+        String std_id = "empty";
+        ArrayList<Records>arrayList = new ArrayList<Records>();
+        if(cursor.moveToNext())
+        {
+            do
+                {
+                    std_id = cursor.getString(4);
+                    if(std_id.equals(id))
+                    {
+                        Records records = new Records();
+
+                        records.setUserName(cursor.getString(1));
+                        records.setEmail(cursor.getString(2));
+                        records.setMobileNo(cursor.getString(3));
+                        records.setStudentId(cursor.getString(4));
+                        records.setCity(cursor.getString(5));
+                        records.setPassword(cursor.getString(6));
+                        arrayList.add(records);
+                        break;
+                    }
+
+
+
+                }while(cursor.moveToNext());
+        }
+        return arrayList;
+    }
+
+
+    public boolean update(String u_Name, String u_Email, String u_Mobile, String u_id, String u_city, String u_pwd)
+    {
+
+        db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN2, u_Name);
+        contentValues.put(COLUMN3, u_Email);
+        contentValues.put(COLUMN4, u_Mobile);
+        contentValues.put(COLUMN5, u_id);
+        contentValues.put(COLUMN6, u_city);
+        contentValues.put(COLUMN7, u_pwd);
+
+        db.update(TABLE_NAME, contentValues, "user_id=?" , new String[]{u_id});
+        return true;
+
+
+    }
+
+    public ArrayList<String> search_list_users()
+    {
+
+        db = this.getReadableDatabase();
+        String query = "select user_name from "+TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<String> arrayList = new ArrayList<String>();
+        String u_name = "empty";
+        if(cursor.moveToNext())
+        {
+            do
+                {
+
+                    u_name = cursor.getString(0);
+                    arrayList.add(u_name);
+
+
+
+                }while(cursor.moveToNext());
+        }
+
+        return arrayList;
+    }
+
+
+}

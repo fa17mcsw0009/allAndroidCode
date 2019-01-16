@@ -1,0 +1,214 @@
+package com.example.fa17mcsw0013.restaurant;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    Spinner spinner;
+    Button find;
+    TextView t1, t2, t3;
+    EditText editText;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        spinner = (Spinner) findViewById(R.id.spinner1); //all are connecting with ids with type cast
+        editText = (EditText) findViewById(R.id.edit);
+        t1 = (TextView) findViewById(R.id.view1);
+        t2 = (TextView) findViewById(R.id.view2);
+        t3 = (TextView) findViewById(R.id.view3);
+        find = (Button) findViewById(R.id.btn);
+
+        ArrayList<String> arrayList = new ArrayList<String>();
+        arrayList.add("karachi");
+        arrayList.add("islamabad");
+        arrayList.add("lahore");
+
+        //put values of arraylist in array adapter with three parameter
+        ArrayAdapter arrayAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, arrayList );
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);//we added drop down resource in array adapter
+        spinner.setAdapter(arrayAdapter);
+
+        find.setOnClickListener(new View.OnClickListener() { //when button clicks something happens
+            @Override
+            public void onClick(View view) {
+
+            String restaurant = editText.getText().toString();
+            String city = String.valueOf(spinner.getSelectedItem());
+
+            //https://api.opencagedata.com/geocode/v1/json?key=58a11e159a2b4234a9f78d0ec14948ba&q=nandos+1%2C+99423+karachi&pretty=1
+                String uri = "https://api.opencagedata.com/geocode/v1/json?key=b502a04aa5f54b50a45dbf894f2c2cdc&q="+restaurant+"+"+city+"&pretty=1";
+
+                Ion.with(getApplicationContext()) //yeh ion lib keh 3 methods hain
+                        .load(uri)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject data) {
+
+                                if(e == null){
+
+                                    JsonArray jsonArray = data.getAsJsonArray("results"); //main array uthaya results kay name say
+                                    JsonObject jsonObject = (JsonObject) jsonArray.get(0); //sirf yehi array uthaya
+                                    JsonObject annotations = jsonObject.getAsJsonObject("annotations");//array kay ander annotations ka object tha
+                                    JsonObject dms = annotations.getAsJsonObject("DMS");//annotations kay under dms ka object tha
+
+
+                                    String lat = dms.get("lat").toString(); //dms object main string lat ki value access ki wo variable main dal di
+                                    String lng = dms.get("lng").toString();
+                                    String restaurant = jsonObject.get("formatted").toString(); //main array result formatted ka string jis ki value restaurant variable miain dal de
+
+
+
+                                    t1.setText(restaurant); //text view main value show kra de
+                                    t2.setText(lat);
+                                    t3.setText(lng);
+
+                                }else{
+                                    Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+
+
+
+            }
+        });
+
+    }
+	//implementation 'com.koushikdutta.ion:ion:2.+'
+}
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------\
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="#FF98BFBA"
+    >
+
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="82dp"
+
+        >
+
+    </Spinner>
+
+    <TextView
+        android:id="@+id/txt1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:text="CHOSE YOUR CITY"
+        android:textSize="40sp"
+        android:textAlignment="center"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="#ffffff"
+        />
+
+    <TextView
+        android:id="@+id/txt2"
+        android:layout_width="match_parent"
+        android:layout_height="79dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="133dp"
+
+        android:text="CHOSE YOUR RESTAURANT"
+        android:textAlignment="center"
+        android:textSize="40sp"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="#ffff"
+        />
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="208dp"
+        android:layout_height="85dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="343dp"
+        android:text="Find"
+        android:background="#FFE2210F"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        />
+
+    <TextView
+        android:id="@+id/view2"
+        android:layout_width="420dp"
+        android:layout_height="71dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="120dp"
+        android:textColor="#ffff" />
+
+    <TextView
+        android:id="@+id/view3"
+        android:layout_width="420dp"
+        android:layout_height="71dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="23dp"
+        android:textColor="#ffff" />
+
+    <TextView
+        android:id="@+id/view1"
+        android:layout_width="420dp"
+        android:layout_height="71dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="224dp"
+        android:textColor="#ffff" />
+
+    <EditText
+        android:id="@+id/edit"
+        android:layout_width="478dp"
+        android:layout_height="87dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="311dp"
+        android:ems="10"
+        android:hint="FIND THE NEAREST RESTAURANT OR PLACE"
+        android:inputType="textPersonName"
+
+        />
+
+
+</RelativeLayout>
+
+
+
+

@@ -1,0 +1,104 @@
+package app.student.com.camera;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    public static final int CAMERA_REQUEST = 9999;
+    ImageView viewimage;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        viewimage = (ImageView) findViewById(R.id.image);
+
+    }
+
+
+
+    public void OpenCamera(View view)
+    {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAMERA_REQUEST);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == CAMERA_REQUEST)
+        {
+            Bitmap images = (Bitmap)data.getExtras().get("data");
+            viewimage.setImageBitmap(images);
+        }
+        else{
+            Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+}
+
+
+
+
+================================================================================================================
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="184dp"
+        android:layout_height="84dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="131dp"
+        android:onClick="OpenCamera"
+        android:text="Take Picture" />
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="407dp"
+        android:layout_height="397dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="99dp"
+        android:layout_marginTop="188dp"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        android:text="CAMERA APP"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textColor="#FFFCFCFC"
+        />
+</RelativeLayout>

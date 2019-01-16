@@ -1,0 +1,65 @@
+package app.picasso.com.picasso;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+    ImageView imageView;
+    Button fromUrl, rotate, resize, error;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        imageView = (ImageView) findViewById(R.id.image_from_url);
+        fromUrl = (Button) findViewById(R.id.b1);
+        rotate = (Button) findViewById(R.id.b2);
+        resize = (Button) findViewById(R.id.b3);
+        error = (Button) findViewById(R.id.b4);
+
+        imageView.setOnClickListener(this);
+        fromUrl.setOnClickListener(this);
+        rotate.setOnClickListener(this);
+        resize.setOnClickListener(this);
+        error.setOnClickListener(this);
+
+
+    }
+
+
+    @Override
+    public void onClick(View view) {
+
+        switch(view.getId()){
+
+            case R.id.b1:
+                Picasso.with(getApplicationContext()).load("http://i.imgur.com/DvpvklR.png").into(imageView);
+                break;
+            case R.id.b2:
+                Picasso.with(getApplicationContext()).load("http://i.imgur.com/DvpvklR.png").rotate(90f).into(imageView);
+                break;
+            case R.id.b3:
+                Picasso.with(getApplicationContext()).load("http://i.imgur.com/DvpvklR.png").resize(200, 200).into(imageView);
+                break;
+            case R.id.b4:
+                Picasso.with(getApplicationContext()).load("http://www.wwe.com").error(R.drawable.ic_launcher_foreground).into(imageView);
+                break;
+        }
+
+    }
+}
+
+implementation 'com.squareup.picasso:picasso:2.5.2'
